@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -13,30 +14,43 @@ func check(err error) {
 	}
 }
 
-func main() {
-	file, err := os.Open("problems.csv")
-	check(err)
+func getReaderFromFile(filename string) (io.ReadCloser, error) {
+	reader, err := os.Open(filename)
+	return reader, err
+}
 
-	r := csv.NewReader(file)
+func extractRecordsFromReader(reader io.ReadCloser) ([][]string, error) {
+	defer reader.Close()
+	return csv.NewReader(reader).ReadAll()
+}
 
-	records, err := r.ReadAll()
-	check(err)
-
-	scanner := bufio.NewScanner(os.Stdin)
-
+func conductQuiz(scanner *bufio.Scanner, questionsWithAnswers [][]string) int {
 	score := 0
 
-	for index, line := range records {
-		question, correctAnswer := line[0], line[1]
+	for index, questionsWithAnswer := range questionsWithAnswers {
+		question, correctAnswer := questionsWithAnswer[0], questionsWithAnswer[1]
 
 		fmt.Printf("Problem #%v: %v = ", index+1, question)
 		scanner.Scan()
 
 		userAnswer := scanner.Text()
+
 		if userAnswer == correctAnswer {
 			score++
 		}
 	}
 
-	fmt.Printf("You scored %v out of %v.", score, len(records))
+	return score
+}
+
+func main() {
+	reader, err := getReaderFromFile("problems.csv")
+	check(err)
+
+	records, err := extractRecordsFromReader(reader)
+	check(err)
+
+	userScore := conductQuiz(bufio.NewScanner(os.Stdin), records)
+
+	fmt.Printf("\nYou scored %v out of %v.", userScore, len(records))
 }
