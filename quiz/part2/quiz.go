@@ -61,15 +61,16 @@ func conductQuiz(scanner *bufio.Scanner, questionsWithAnswers [][]string, timeLi
 }
 
 func main() {
-	reader, err := getReaderFromFile("../problems.csv")
+	timeLimitPtr := flag.Int("limit", 30, "the time limit for quiz in seconds")
+	csvFilePathPtr := flag.String("csv", "../problems.csv", "the path of the CSV file")
+
+	flag.Parse()
+
+	reader, err := getReaderFromFile(*csvFilePathPtr)
 	check(err)
 
 	records, err := extractRecordsFromReader(reader)
 	check(err)
-
-	timeLimitPtr := flag.Int("limit", 30, "the time limit for quiz in seconds")
-
-	flag.Parse()
 
 	userScore := conductQuiz(bufio.NewScanner(os.Stdin), records, time.Duration(*timeLimitPtr)*(time.Second))
 
