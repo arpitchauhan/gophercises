@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -66,7 +67,11 @@ func main() {
 	records, err := extractRecordsFromReader(reader)
 	check(err)
 
-	userScore := conductQuiz(bufio.NewScanner(os.Stdin), records, 30*time.Second)
+	timeLimitPtr := flag.Int("limit", 30, "the time limit for quiz in seconds")
+
+	flag.Parse()
+
+	userScore := conductQuiz(bufio.NewScanner(os.Stdin), records, time.Duration(*timeLimitPtr)*(time.Second))
 
 	fmt.Printf("\nYou scored %v out of %v.", userScore, len(records))
 }
