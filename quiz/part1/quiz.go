@@ -44,7 +44,7 @@ func conductQuiz(scanner *bufio.Scanner, questionsWithAnswers [][]string) int {
 }
 
 func main() {
-	reader, err := getReaderFromFile("problems.csv")
+	reader, err := getReaderFromFile("../problems.csv")
 	check(err)
 
 	records, err := extractRecordsFromReader(reader)
